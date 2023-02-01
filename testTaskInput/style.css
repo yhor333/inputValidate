@@ -1,0 +1,11 @@
+.check-wrap {
+  display: flex;
+  margin-top: 20px;
+}
+
+.check__block {
+  background-color: #787878;
+  height: 15px;
+  margin-right: 20px;
+  width: 45px;
+}
