@@ -1,16 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import Input from '../Input/Input';
 import Block from '../Block/Block';
 
-import './Form.css';
+import { validatePassword, isLenghtCorrectly } from '../../Utils/index.js';
 
-const initialStrengthChecks = {
-  length: 0,
-  hasOnlyLeters: false,
-  hasOnlyNumbers: false,
-  hasSpecialChar: false,
-};
+import './Form.css';
 
 const strengthLvl = {
   red: 'red',
@@ -23,54 +18,30 @@ const Form = () => {
   const { red, green, grey, yellow } = strengthLvl;
   const [password, setPassword] = useState('');
   const [blockColors, setBlockColors] = useState([grey, grey, grey]);
-  const [strengthChecks, setStrengthChecks] = useState(initialStrengthChecks);
-  useEffect(() => {
-    validatePassword();
-  }, [password]);
 
-  useEffect(() => {
-    howStrongPassword();
-  }, [strengthChecks]);
-
-  const isLenghtCorrectly = (passwordLength) => {
-    if (passwordLength < 8) {
-      return false;
-    }
-    return true;
-  };
-
-  const validatePassword = () => {
-    const updatedStrength = {};
-    updatedStrength.length = password.length;
-    updatedStrength.hasOnlyLeters = /[A-Za-z]+/.test(password);
-    updatedStrength.hasOnlyNumber = /[0-9]+/.test(password);
-    updatedStrength.hasSpecialChar = /[!@#$%^&*)(+=._-]+/.test(password);
-    setStrengthChecks(updatedStrength);
-  };
-
-  const howStrongPassword = () => {
-    let verifiedList = Object.values(strengthChecks).filter((value) => {
-      return value;
-    });
-    if (isLenghtCorrectly(strengthChecks.length)) {
-      if (verifiedList.length === 4) {
-        setBlockColors([green, green, green]);
-        return;
-      }
-      if (verifiedList.length >= 3) {
-        setBlockColors([yellow, yellow, grey]);
-        return;
-      }
-      setBlockColors([red, grey, grey]);
+  const howStrongPassword = (verifiedList, password) => {
+    if (!isLenghtCorrectly(password.length)) {
+      setBlockColors([red, red, red]);
       return;
     }
-    setBlockColors([red, red, red]);
-    return;
+    if (verifiedList.length === 4) {
+      setBlockColors([green, green, green]);
+    } else if (verifiedList.length >= 3) {
+      setBlockColors([yellow, yellow, grey]);
+    } else {
+      setBlockColors([red, grey, grey]);
+    }
   };
 
   const handlePassword = (event) => {
-    setPassword(event.target.value);
+    const currentPassword = event.target.value;
+    setPassword(currentPassword);
+    let verifiedList = Object.values(validatePassword(currentPassword)).filter(
+      (value) => value
+    );
+    howStrongPassword(verifiedList, currentPassword);
   };
+
   return (
     <form>
       <Input
